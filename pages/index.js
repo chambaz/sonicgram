@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
-import getUserMedia from 'getusermedia'
 import { Global, css } from '@emotion/core'
+import getUserMedia from 'getusermedia'
 import styled from '@emotion/styled'
 
 const Page = styled.div({
@@ -43,8 +43,9 @@ const Preview = styled.div({
 
 function Index() {
   let recordRtc
-  let recorder
   let waveSurfer
+  let canvasToImage
+  let recorder
   let waver
 
   const recordBtn = useRef()
@@ -53,6 +54,7 @@ function Index() {
   useEffect(() => {
     recordRtc = require('recordrtc')
     waveSurfer = require('wavesurfer.js')
+    canvasToImage = require('canvas-to-image')
 
     waver = waveSurfer.create({
       container: wave.current,
@@ -99,6 +101,15 @@ function Index() {
     waver.play()
   }
 
+  function download() {
+    wave.current.querySelector('canvas').id = 'canvas'
+    canvasToImage('canvas', {
+      name: 'sonicgram',
+      type: 'png',
+      quality: 1
+    })
+  }
+
   function drawWaveForm(data) {
     waver.empty()
     waver.load(data)
@@ -126,7 +137,10 @@ function Index() {
       </div>
       <PreviewContainer>
         <Preview ref={wave} />
-        <Button onClick={play}>Play</Button>
+        <div>
+          <Button onClick={play}>Play</Button>
+          <Button onClick={download}>Download</Button>
+        </div>
       </PreviewContainer>
     </Page>
   )

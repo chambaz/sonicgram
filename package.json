@@ -19,6 +19,8 @@
     "react": "~16.8.3",
     "react-dom": "~16.8.3",
     "recordrtc": "~5.5.4",
+    "sentiment": "~5.0.1",
+    "voice-speech-recognition": "~1.1.2",
     "wavesurfer.js": "~2.2.1"
   }
 }

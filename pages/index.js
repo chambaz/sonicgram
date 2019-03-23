@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Global, css } from '@emotion/core'
 import getUserMedia from 'getusermedia'
+import Sentiment from 'sentiment'
 import styled from '@emotion/styled'
 
 const Page = styled.div({
@@ -46,15 +47,22 @@ function Index() {
   let waveSurfer
   let canvasToImage
   let recorder
+  let vsr
+  let recognizer
   let waver
+
+  const sentiment = new Sentiment()
 
   const recordBtn = useRef()
   const wave = useRef()
+  const result = useRef()
+  const score = useRef()
 
   useEffect(() => {
     recordRtc = require('recordrtc')
     waveSurfer = require('wavesurfer.js')
     canvasToImage = require('canvas-to-image')
+    vsr = require('voice-speech-recognition')
 
     waver = waveSurfer.create({
       container: wave.current,
@@ -63,6 +71,8 @@ function Index() {
       barWidth: 10,
       height: 250
     })
+
+    recognizer = vsr.voiceSpeechRecognition()
   })
 
   function start() {
@@ -83,6 +93,18 @@ function Index() {
           })
 
           recorder.startRecording()
+          recognizer.startRecognition()
+
+          recognizer.addEventListener('end', () => {
+            const sentimentAnalysis = sentiment.analyze(
+              recognizer.finalRecognizing
+            )
+            result.current.innerHTML = recognizer.finalRecognizing
+            score.current.innerHTML = `Sentiment Score: ${
+              sentimentAnalysis.score
+            }`
+            console.log(sentiment.analyze(recognizer.finalRecognizing))
+          })
         }
       }
     )
@@ -90,6 +112,7 @@ function Index() {
 
   function stop() {
     recorder.stopRecording(blob => {
+      recognizer.stopRecognition()
       recordBtn.current.innerHTML = 'Record'
       recorder.getDataURL(data => {
         drawWaveForm(data)
@@ -137,6 +160,8 @@ function Index() {
       </div>
       <PreviewContainer>
         <Preview ref={wave} />
+        <p ref={result} />
+        <p ref={score} />
         <div>
           <Button onClick={play}>Play</Button>
           <Button onClick={download}>Download</Button>

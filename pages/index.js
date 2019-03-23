@@ -38,8 +38,7 @@ const PreviewContainer = styled.div({
 })
 
 const Preview = styled.div({
-  width: '400px',
-  border: 'solid 2px white',
+  width: '80vw',
   margin: '20px 0'
 })
 

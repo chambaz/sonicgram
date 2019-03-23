@@ -1,0 +1,23 @@
+{
+  "name": "sonicgram",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "author": "Digital Surgeons",
+  "license": "ISC",
+  "dependencies": {
+    "getusermedia": "~2.0.1",
+    "next": "~8.0.3",
+    "react": "~16.8.3",
+    "react-dom": "~16.8.3",
+    "recordrtc": "~5.5.4",
+    "wavesurfer.js": "~2.2.1",
+    "@emotion/core": "~10.0.7",
+    "@emotion/styled": "~10.0.7"
+  }
+}

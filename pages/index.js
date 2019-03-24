@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { Global, css } from '@emotion/core'
+import { saveAs } from 'file-saver'
 import getUserMedia from 'getusermedia'
 import Sentiment from 'sentiment'
 import styled from '@emotion/styled'
+import domtoimage from 'dom-to-image'
 
 // styled components
 const Page = styled.div({
@@ -14,13 +16,19 @@ const Page = styled.div({
   flexDirection: 'column',
   margin: 0,
   background: 'black',
+  backgroundSize: 'cover',
   color: 'white',
   fontFamily: 'Menlo',
-  overflow: 'hidden'
+  overflow: 'hidden',
+  transition: '.5s'
 })
 
 const Heading = styled.h1({
   fontWeight: 'normal'
+})
+
+const Logo = styled.img({
+  width: '200px'
 })
 
 const Button = styled.button({
@@ -55,6 +63,7 @@ function Index() {
 
   // DOM node references
   // TODO: useState not playing nicely with browser APIs
+  const page = useRef()
   const recordBtn = useRef()
   const wave = useRef()
   const result = useRef()
@@ -64,14 +73,13 @@ function Index() {
   useEffect(() => {
     recordRtc = require('recordrtc')
     waveSurfer = require('wavesurfer.js')
-    canvasToImage = require('canvas-to-image')
     vsr = require('voice-speech-recognition')
 
     // initialize wave surfer
     waver = waveSurfer.create({
       container: wave.current,
-      waveColor: 'violet',
-      progressColor: 'purple',
+      waveColor: '#f3fe42',
+      progressColor: '#000000',
       barWidth: 10,
       height: 250
     })
@@ -116,6 +124,17 @@ function Index() {
               sentimentAnalysis.score
             }`
             console.log(sentiment.analyze(recognizer.finalRecognizing))
+
+            if (sentimentAnalysis.score < 0) {
+              page.current.style.backgroundImage = 'url(/static/negative.svg)'
+              page.current.style.backgroundColor = '#e70005'
+            } else if (sentimentAnalysis.score > 0) {
+              page.current.style.backgroundImage = 'none'
+              page.current.style.backgroundColor = '#e400ff'
+            } else {
+              page.current.style.backgroundImage = 'none'
+              page.current.style.backgroundColor = '#6c6c6c'
+            }
           })
         }
       }
@@ -143,11 +162,8 @@ function Index() {
 
   // download waveform as png
   function download() {
-    wave.current.querySelector('canvas').id = 'canvas'
-    canvasToImage('canvas', {
-      name: 'sonicgram',
-      type: 'png',
-      quality: 1
+    domtoimage.toBlob(page.current).then(function(blob) {
+      saveAs(blob, 'sonicgram.png')
     })
   }
 
@@ -158,7 +174,7 @@ function Index() {
   }
 
   return (
-    <Page>
+    <Page ref={page}>
       <Global
         styles={css`
           * {
@@ -170,21 +186,21 @@ function Index() {
           }
         `}
       />
-      <Heading>∿ SonicGram ∿</Heading>
+      <Heading>
+        <Logo src="/static/sonicgram.svg" />
+      </Heading>
       <div>
         <Button ref={recordBtn} onClick={start}>
           Record
         </Button>
         <Button onClick={stop}>Stop</Button>
+        <Button onClick={play}>Play</Button>
+        <Button onClick={download}>Download</Button>
       </div>
       <PreviewContainer>
         <Preview ref={wave} />
         <p ref={result} />
         <p ref={score} />
-        <div>
-          <Button onClick={play}>Play</Button>
-          <Button onClick={download}>Download</Button>
-        </div>
       </PreviewContainer>
     </Page>
   )

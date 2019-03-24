@@ -20,7 +20,7 @@ const Page = styled.div({
   color: 'white',
   fontFamily: 'Menlo',
   overflow: 'hidden',
-  transition: '.5s'
+  transition: 'background-color .5s'
 })
 
 const Heading = styled.h1({
@@ -81,7 +81,8 @@ function Index() {
       waveColor: '#f3fe42',
       progressColor: '#000000',
       barWidth: 10,
-      height: 250
+      height: 250,
+      cursorWidth: 0
     })
 
     // initialize WebSpeech API library
@@ -129,7 +130,7 @@ function Index() {
               page.current.style.backgroundImage = 'url(/static/negative.svg)'
               page.current.style.backgroundColor = '#e70005'
             } else if (sentimentAnalysis.score > 0) {
-              page.current.style.backgroundImage = 'none'
+              page.current.style.backgroundImage = 'url(/static/positive.svg)'
               page.current.style.backgroundColor = '#e400ff'
             } else {
               page.current.style.backgroundImage = 'none'
